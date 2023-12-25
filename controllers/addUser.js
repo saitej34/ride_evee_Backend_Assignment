@@ -27,22 +27,24 @@ async function addUser(req,res){
         return res.status(409).json({"status": "Failed", "message": "Email already registered"});
     }
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const udata = {
-        name: name,
-        email: email,
-        phone: phone,
-        password: hashedPassword,
-        role: role
-    };
-    const payload = {
-        user:udata
-      };
-      
-    const user = User(udata);
-    const token = jwt.sign(payload,"ride",{ expiresIn: '1h' }); 
     try 
     {
-        await user.save();
+        const udata = {
+            name: name,
+            email: email,
+            phone: phone,
+            password: hashedPassword,
+            role: role
+        };
+        const user = User(udata);
+        const result= await user.save();
+        //console.log(result);
+        udata._id = result._id;
+        const payload = {
+            user:udata
+        };
+        //console.log(payload);
+        const token = jwt.sign(payload,"ride",{ expiresIn: '1h' }); 
         return res.status(200).json({"status": "Success", "message": "Registration successful","token":token});
     } catch (error) 
     {

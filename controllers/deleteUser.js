@@ -1,6 +1,6 @@
 const User = require('../database/User')
 
-async function deleteUser(req,res) 
+async function deleteUser(req,res)  /// can be done by admin
 {
     const userId = req.params.id;
     try 
@@ -10,11 +10,11 @@ async function deleteUser(req,res)
         {
             return res.status(404).json({ "status": "Failed", "message": "User not found" });
         }
-        if(user.email != req.user.email)
+        if(req.user.role === "user")
         {
-            return res.status(401).json({"status":"Success","message":"Unauthorized"});
+            return res.status(401).json({"status":"Failed","message":"Unauthorized"});
         }
-        await User.findByIdAndDelete({"_id":userId})
+        const result = await User.findByIdAndDelete(userId);
         return res.status(200).json({ "status": "Success", "message": "User deleted successfully" });
     } catch (error) 
     {
